@@ -1,23 +1,34 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import './index.css';
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./css/bootstrap/bootstrap.css";
+import "./css/font_awesome/css/all.min.css";
+import "./css/my.css";
+
+import HomePage from "./pages/HomePage";
+import AddNews from "./pages/AddNews";
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
-root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>
-);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+function MyApp() {
+  return <div className={"display-6"}>HELLO</div>;
+}
+// этот блок "вставляется" в блок id=root
+root.render(
+  // <React.StrictMode>
+  //   <Provider store={store}>
+  //   <MyApp/>,
+  // virtual-router
+  <Router>
+    <Routes>
+      <Route path="/" element={<HomePage />}></Route>
+      <Route path="/home" element={<HomePage />}></Route>
+      <Route path="/add_news" element={<AddNews />}></Route>
+    </Routes>
+  </Router>,
+  // <Apps />
+  // </Provider>
+  // </React.StrictMode>
+);
