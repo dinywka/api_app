@@ -1,65 +1,40 @@
-import React from "react";
-import * as bases from "../components/ui/bases";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function Page() {
-  let message = "";
+interface NewsItem {
+  title: string;
+  // Add other fields if necessary
+}
 
-  async function sendData() {
-    try {
-      const data = {
-        message: message,
-      };
-      const response = await axios.post(
-        "http://127.0.0.1:8000/news/",
-        data,
-      );
-      console.log("response: ", response);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  }
+export default function NewsPage() {
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
 
-  async function getData() {
-    try {
-      const response = await axios.get("http://127.0.0.1:8000/news/");
-      console.log("response: ", response);
-    } catch (error) {
-      console.log("error: ", error);
+  useEffect(() => {
+    async function fetchNews() {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/");
+        setNewsData(response.data);
+      } catch (error) {
+        console.log("error fetching news:", error);
+      }
     }
-  }
+    fetchNews();
+  }, []);
 
   return (
-    <bases.Base1>
-      <div className={"container p-3"}>
-        <div className="col-md-7 col-lg-8">
-          <form
-            className="needs-validation"
-            onSubmit={(event) => {
-              event.preventDefault();
-              sendData();
-            }}
-          >
-            <label className="form-label">Сообщение</label>
-            <div className="input-group input-group-lg">
-              <input
-                type="text"
-                className="form-control w-75"
-                id="firstName"
-                placeholder=""
-                required
-                minLength={10}
-                onChange={(event) => {
-                  message = event.target.value;
-                }}
-              />
-              <button className="w-25 btn btn-primary btn-lg" type="submit">
-                отправить
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </bases.Base1>
+    <div className={"container p-3"}>
+      <h2>News</h2>
+      {newsData.length === 0 ? (
+        <p>No news available.</p>
+      ) : (
+        <ul>
+          {newsData.map((newsItem, index) => (
+            <li key={index}>
+              {newsItem.title}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

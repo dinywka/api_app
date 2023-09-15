@@ -7,6 +7,7 @@ import "./css/my.css";
 
 import HomePage from "./pages/HomePage";
 import AddNews from "./pages/AddNews";
+import NewsPage from "./pages/NewsPage";
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -26,6 +27,7 @@ root.render(
       <Route path="/" element={<HomePage />}></Route>
       <Route path="/home" element={<HomePage />}></Route>
       <Route path="/add_news" element={<AddNews />}></Route>
+        <Route path="/news_page" element={<NewsPage />}></Route>
     </Routes>
   </Router>,
   // <Apps />

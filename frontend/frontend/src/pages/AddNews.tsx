@@ -15,7 +15,7 @@ export default function Page() {
       const data = {
         name: name,
         title: title,
-        news: news
+        news: news,
       };
       const response = await axios.post("http://127.0.0.1:8000/api/", data);
       console.log(response.status);
@@ -62,6 +62,10 @@ export default function Page() {
                   className="form-control"
                   id="title"
                   placeholder="Заголовок новости"
+                  minLength={3}
+                  onChange={(event) => {
+                    title = event.target.value;
+                  }}
                 />
               </div>
 
@@ -74,6 +78,10 @@ export default function Page() {
                   className="form-control"
                   id="news"
                   placeholder="Опишите подробно"
+                  minLength={3}
+                  onChange={(event) => {
+                    news = event.target.value;
+                  }}
                 />
               </div>
             </div>

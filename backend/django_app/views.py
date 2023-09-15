@@ -4,30 +4,29 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.templatetags.rest_framework import data
+from rest_framework.views import APIView
+from .models import News
+from .serializers import NewsSerializer
+
 
 # Create your views here.
 def home(request):
     return HttpResponse("OK")
-
+@api_view(http_method_names=["GET", "POST"])
 def api(request):
     if request.method == "POST":
+        print(data)
+        serializer = NewsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'GET':
+        news = News.objects.all()
+        serializer = NewsSerializer(news, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({"error": "Unsupported method"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-@api_view(http_method_names=["GET", "POST"])
-def news(request: Request) -> Response:
-    if request.method == "GET":
-        with open("messages.txt", "r", encoding="utf-8") as file:
-            lines = file.readlines()
-        data = {"messages": lines}
-        return Response(data=data, status=status.HTTP_200_OK)
-    elif request.method == "POST":
-        print(request.GET)
-        print(request.POST)
-        print(request.FILES)
-        print(request.data)
-
-        message: str = request.data.get('message', '')
-        with open("messages.txt", "a", encoding="utf-8") as file:
-            file.write(f"{message}\n")
-
-        return Response(data={"message": "OK"}, status=status.HTTP_201_CREATED)

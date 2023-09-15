@@ -11,7 +11,9 @@ export function Navbar1() {
           <li className="nav-item"><Link to={"/add_news"} className="nav-link px-2 text-secondary">
                 Создать новость
               </Link></li>
-          <li className="nav-item"><a href="#" className="nav-link">Новости</a></li>
+          <li className="nav-item"><Link to={"/news_page"} className="nav-link px-2 text-secondary">
+                Новости
+              </Link></li>
           <li className="nav-item"><a href="#" className="nav-link">FAQs</a></li>
           <li className="nav-item"><a href="#" className="nav-link">О нас</a></li>
         </ul>
