@@ -6,5 +6,6 @@ urlpatterns = [
     path('', views.home),
     path('home/', views.home),
     path('api/', views.api),
-    # path('news/', views.news),
+    path('add_complaint/', views.add_complaint),
+    path('add_complaint/<str:point_id>', views.add_complaint),
 ]

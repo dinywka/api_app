@@ -8,3 +8,9 @@ class News(models.Model):
     def __str__(self):
         return self.title
 
+class Complaint(models.Model):
+    name = models.CharField(max_length=20)
+    description = models.CharField(max_length=800)
+
+    def __str__(self):
+        return self.description
