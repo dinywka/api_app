@@ -8,6 +8,7 @@ from rest_framework.templatetags.rest_framework import data
 from rest_framework.views import APIView
 from .models import News, Complaint
 from .serializers import NewsSerializer, ComplaintSerializer
+from django.shortcuts import render
 
 
 # Create your views here.
@@ -29,28 +30,8 @@ def api(request):
     else:
         return Response({"error": "Unsupported method"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
-# @api_view(http_method_names=["GET", "PUT", "DELETE", "POST"])
-# def add_complaint(request: Request, point_id: str = "-1") -> Response:
-#     if point_id == "-1":
-#         if request.method == "GET":
-#             compl_json = ComplaintSerializer(data=request.data)
-#             return Response(data=compl_json, status=status.HTTP_200_OK)
-#         elif request.method == "POST":
-#             if compl_json.is_valid():
-#                 compl_json.save()
-#                 return Response(data={"message": "success"}, status=status.HTTP_201_CREATED)
-#     else:
-#         if request.method == "GET":
-#             # Получение детальных данных по point_id
-#             return Response(data={"data": []}, status=status.HTTP_200_OK)
-#         elif request.method == "PUT":
-#             # Обновление записи по point_id
-#             return Response(data={"message": "success"}, status=status.HTTP_200_OK)
-#         elif request.method == "DELETE":
-#             # Удаление записи по point_id
-#             return Response(data={"message": "success"}, status=status.HTTP_200_OK)
-
+def index(request):
+    return render(request, "index.html", context={})
 @api_view(["GET", "POST", "PUT", "DELETE"])
 def add_complaint(request: Request, point_id: str = None) -> Response:
     if point_id:
