@@ -10,6 +10,7 @@ import AddNews from "./pages/AddNews";
 import NewsPage from "./pages/NewsPage";
 import AddComplaint from "./pages/AddComplaint";
 
+
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 

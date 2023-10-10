@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -9,10 +9,13 @@ from rest_framework.views import APIView
 from .models import News, Complaint
 from .serializers import NewsSerializer, ComplaintSerializer
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 def home(request):
+    if request.method == "POST":
+        return HttpResponseNotAllowed(['GET'])
     return HttpResponse("OK")
 @api_view(http_method_names=["GET", "POST"])
 def api(request):
@@ -72,3 +75,5 @@ def add_complaint(request: Request, point_id: str = None) -> Response:
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({"error": "Point ID is required for deletion."}, status=status.HTTP_400_BAD_REQUEST)
+
+
