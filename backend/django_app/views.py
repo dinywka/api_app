@@ -1,15 +1,13 @@
-from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseNotAllowed
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.templatetags.rest_framework import data
-from rest_framework.views import APIView
 from .models import News, Complaint
 from .serializers import NewsSerializer, ComplaintSerializer
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -17,8 +15,12 @@ def home(request):
     if request.method == "POST":
         return HttpResponseNotAllowed(['GET'])
     return HttpResponse("OK")
+
+@swagger_auto_schema(method='GET', responses={200: NewsSerializer(many=True)})
+@swagger_auto_schema(method='POST', request_body=NewsSerializer, responses={201: NewsSerializer, 400: "Bad Request"})
 @api_view(http_method_names=["GET", "POST"])
 def api(request):
+    '''Create new news'''
     if request.method == "POST":
         print(data)
         serializer = NewsSerializer(data=request.data)
