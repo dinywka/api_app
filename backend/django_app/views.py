@@ -10,7 +10,6 @@ from .serializers import NewsSerializer, ComplaintSerializer
 from django.shortcuts import render
 
 
-# Create your views here.
 def home(request):
     if request.method == "POST":
         return HttpResponseNotAllowed(['GET'])
@@ -37,8 +36,14 @@ def api(request):
 
 def index(request):
     return render(request, "index.html", context={})
+
+@swagger_auto_schema(method='GET', responses={200: ComplaintSerializer(many=True)})
+@swagger_auto_schema(method='POST', request_body=ComplaintSerializer, responses={201: ComplaintSerializer, 400: "Bad Request"})
 @api_view(["GET", "POST", "PUT", "DELETE"])
 def add_complaint(request: Request, point_id: str = None) -> Response:
+    """
+    Add a new complaint
+    """
     if point_id:
         try:
             complaint = Complaint.objects.get(pk=point_id)
