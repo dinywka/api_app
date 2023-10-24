@@ -1,15 +1,22 @@
 from django.http import HttpResponse, HttpResponseNotAllowed
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.templatetags.rest_framework import data
 from .models import News, Complaint
 from .serializers import NewsSerializer, ComplaintSerializer
-from django.shortcuts import render
 from django.db import transaction
 import datetime
+from rest_framework import status, views
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.response import Response
+
 
 
 def home(request):
@@ -149,5 +156,92 @@ def trasaction_create(request):
         print(f"[ERROR] ({datetime.datetime.now()}): ", error)
         transaction.rollback()
         return HttpResponse(f"Ошибка создания {error}")
+
+
+def get_users():
+    users = User.objects.all()
+    user_json = []
+    for i in users:
+        user_json.append({"id": i.id, "username": i.username, "email": i.email, "password": i.password})
+    return user_json
+
+
+def public_users_list(request):
+    _users = get_users()
+    return JsonResponse(data={"message": "OK", "list": _users}, safe=False)
+
+
+@login_required(login_url="login")
+def private_users_list(request):
+    _users = get_users()
+    return JsonResponse(data={"message": "OK", "list": _users}, safe=False)
+
+
+@login_required(login_url="login")
+def admin_users_list(request):
+    if not request.user.is_superuser:
+        raise Exception("You are not superuser!")
+    _users = get_users()
+    return JsonResponse(data={"message": "OK", "list": _users}, safe=False)
+
+
+@login_required(login_url="login")
+def our_moderator_users_list(request):
+    current_user = request.user
+
+    target_group = Group.objects.get(name="Наши модераторы")
+    has = current_user.groups.filter(name=target_group.name).count()
+    if has <= 0:
+        raise Exception("Вы не наш модератор!")
+
+    _users = get_users()
+    return JsonResponse(data={"message": "OK", "list": _users}, safe=False)
+
+
+def f_login(request):
+    if request.method == "GET":
+        return HttpResponse("Залогиньтесь")
+    elif request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            raise Exception("Логин или пароль неверные!")
+        login(request, user)
+        return redirect(reverse('private_users_list'))
+
+
+@api_view(http_method_names=["GET"])
+@permission_classes([AllowAny])
+def drf_public_users_list(request):
+    _users = get_users()
+    return Response(data={"message": "OK", "list": _users}, status=status.HTTP_200_OK)
+
+
+@api_view(http_method_names=["GET"])
+@permission_classes([IsAuthenticated])
+def drf_private_users_list(request):
+    _users = get_users()
+    return Response(data={"message": "OK", "list": _users}, status=status.HTTP_200_OK)
+
+
+def f_logout(request):
+    logout(request)
+    return redirect(reverse('login'))
+
+def select_related(request):
+    news_with_authors = News.objects.select_related('author').all()
+    for news in news_with_authors:
+        print(news.author.username)
+
+def prefetch_related(request):
+    complaints_with_news = Complaint.objects.prefetch_related('news').all()
+    print(complaints_with_news)
+    news_with_complaints = News.objects.prefetch_related('complaints').all()
+    for news_item in news_with_complaints:
+        for complaint in news_item.complaints.all():
+            print(complaint.description)
+
+
 
 
